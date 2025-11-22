@@ -3,6 +3,32 @@
   "description": "Complete fake simulation layer for MySQL, DBAL, Redis, and Mongo adapters.",
   "type": "library",
   "license": "MIT",
+  "keywords": [
+    "php",
+    "testing",
+    "fake",
+    "mock",
+    "in-memory",
+    "adapter",
+    "mysql",
+    "redis",
+    "mongodb",
+    "mongo",
+    "dbal",
+    "database",
+    "storage",
+    "simulation",
+    "unit-test",
+    "integration-test",
+    "phpstan",
+    "phpunit",
+    "maatify",
+    "maatify-dev",
+    "data-adapters",
+    "fake-database",
+    "mock-database"
+  ],
+
   "autoload": {
     "psr-4": {
       "Maatify\\DataFakes\\": "src/"
