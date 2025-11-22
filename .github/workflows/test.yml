@@ -170,5 +170,85 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_CI_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CI_CHAT_ID }}
         run: |
-          # same telegram block kept as-is
-          echo "Sending telegram..."
+
+          START_TS=$(date -u -d "$GH_START_ISO" +%s)
+
+          END_TS=$(date +%s)
+
+          START_TIME=$(date -u -d "@$START_TS" +"%H:%M:%S UTC")
+
+          END_TIME=$(date -u +"%H:%M:%S UTC")
+
+          DURATION=$((END_TS - START_TS))
+
+          if [ "$DURATION" -lt 60 ]; then
+          DURATION_STR="${DURATION}s"
+          else
+          DURATION_STR="$(($DURATION / 60))m $(($DURATION % 60))s"
+          fi
+
+          echo "Start: $START_TIME"
+          echo "End: $END_TIME"
+          echo "Duration: $DURATION_STR"
+
+          STATUS="✅ Tests passed successfully!"
+          COLOR="🟢"
+
+          HEADER="Maatify CI Report (maatify/data-fakes)"
+          if grep -q "FAILURES!" phpunit.log || [ "${{ job.status }}" != "success" ]; then
+            STATUS="❌ Some tests failed. Please review the log."
+            COLOR="🔴"
+            HEADER="Maatify CI Alert (maatify/data-fakes)"
+          fi
+
+          PROJECT="maatify/data-fakes"
+          BRANCH="$GITHUB_REF_NAME"
+          ACTOR="$GITHUB_ACTOR"
+          URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+          PHPSTAN_ERRORS="${{ steps.phpstan.outputs.phpstan_errors }}"
+
+          if [ "$PHPSTAN_ERRORS" -eq 0 ]; then
+          PHPSTAN_SUMMARY="🧹 <b>PHPStan:</b> Passed (0 errors)"
+          else
+          PHPSTAN_SUMMARY="🧹 <b>PHPStan:</b> ${PHPSTAN_ERRORS} errors detected"
+          fi
+
+          MESSAGE="📢 <b>${HEADER}</b>
+
+          ${COLOR} ${STATUS}
+
+          ${PHPSTAN_SUMMARY}
+
+          📦 <b>Project:</b> ${PROJECT}
+          🧱 <b>Branch:</b> ${BRANCH}
+          👷‍♂️ <b>Committer:</b> ${ACTOR}
+
+
+          ⏱ <b>Start:</b> ${START_TIME}
+          🕒 <b>End:</b> ${END_TIME}
+          📈 <b>Duration:</b> ${DURATION_STR}
+
+
+          🔗 <a href='${URL}'>View Run Log</a>"
+
+
+          echo "📨 Sending Telegram JSON notification..."
+          PAYLOAD=$(jq -n \
+            --arg chat_id "$TELEGRAM_CHAT_ID" \
+            --arg text "$MESSAGE" \
+            --arg parse_mode "HTML" \
+            '{chat_id: $chat_id, text: $text, parse_mode: $parse_mode}')
+
+          RESPONSE=$(curl -s -o /tmp/tg_resp.json -w "%{http_code}" \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD")
+
+          if [ "$RESPONSE" -ne 200 ]; then
+            echo "⚠️ Telegram notification failed (HTTP $RESPONSE)" >> $GITHUB_STEP_SUMMARY
+            cat /tmp/tg_resp.json >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Telegram notification sent successfully." >> $GITHUB_STEP_SUMMARY
+          fi
+      
