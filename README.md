@@ -24,55 +24,65 @@
 
 # 📘 Maatify Data Fakes
 
-**In-Memory Fake Adapters for MySQL, Redis, and MongoDB**
-**Version:** 1.0.0
-**Project:** `maatify/data-fakes`
-**Author:** Maatify.dev
+**In-Memory Fake Adapters for MySQL, Redis, MongoDB & Repository Layer**  
+**Version:** 1.0.1  
+**Project:** `maatify/data-fakes`  
+**Maintained by:** Maatify.dev
 
 ---
 
 ## 🚀 Overview
 
-`maatify/data-fakes` is a lightweight, deterministic **in-memory data simulation engine** compatible with all official Maatify Data Adapters.
+`maatify/data-fakes` is a deterministic, lightweight **in-memory data simulation engine** fully compatible with all official Maatify Data Adapters.
 
-It allows any repository or service to be tested **without real databases**, providing:
+It allows any repository or service to run and be tested **without any real databases**, providing:
 
 * Fake MySQL Adapter
 * Fake MySQL DBAL Adapter
 * Fake Redis Adapter
 * Fake MongoDB Adapter
+* Fake Repository Layer (Phase 5)
 * Fully deterministic test isolation
-* Zero external services required (ideal for CI)
+* Zero external services required — perfect for CI
 
-All Fake Adapters follow the exact same contracts used by real adapters.
+All Fake Adapters follow the **exact same contracts** used by real adapters across the Maatify ecosystem.
 
 ---
 
 ## 🔑 Core Dependencies
 
-The entire library depends on two interfaces:
+The core of the entire library is built on two interfaces:
 
-1. `Maatify\Common\Contracts\Adapter\AdapterInterface`
-2. `Maatify\DataAdapters\Contracts\ResolverInterface`
+1. **AdapterInterface**
+   `Maatify\Common\Contracts\Adapter\AdapterInterface`
 
-This ensures 1:1 behavior between **fake** and **real** data layers.
+2. **ResolverInterface**
+   `Maatify\DataAdapters\Contracts\ResolverInterface`
+
+Every Fake Adapter implements `AdapterInterface`
+and is routed through `ResolverInterface` to ensure **1:1 behavior** with real adapters.
 
 ---
 
 ## 🧩 Features
 
-* In-memory table/collection simulation
-* Auto-increment support
-* MQL-like operators for fake Mongo
-* Redis-like lists, hashes, counters, TTL
-* SQL-like filtering, ordering, limit/offset
-* Adapter lifecycle support:
+* Fully in-memory storage layer
+* Auto-increment & mixed ID handling
+* SQL-like filtering (where/in/like/order/limit)
+* Redis-like operations (strings, lists, hashes, counters, TTL)
+* Mongo-like operators (`$in`, `$gt`, `$lte`, `$ne`, etc.)
+* Fake Repository layer:
+
+    * FakeRepository
+    * FakeCollection
+    * ArrayHydrator
+* Complete Adapter lifecycle:
 
     * `connect()`, `disconnect()`
     * `healthCheck()`
     * `isConnected()`
     * `getDriver()`
-* Test isolation using a shared `FakeStorageLayer`
+* Test isolation using `FakeStorageLayer`
 
 ---
 
@@ -82,13 +92,14 @@ This ensures 1:1 behavior between **fake** and **real** data layers.
 composer require maatify/data-fakes --dev
 ```
 
-This library is intended for **testing environments**, not production.
+✔ Intended for **testing environments**
+✘ Not intended for production usage
 
 ---
 
 ## 🧪 Basic Usage
 
-### Use Fake Resolver
+### Using the Fake Resolver
 
 ```php
 use Maatify\DataFakes\Resolvers\FakeResolver;
@@ -107,28 +118,38 @@ FakeStorageLayer::reset();
 
 ---
 
-## 📁 Fake Adapters Included
+## 📁 Fake Components Included
 
-* `FakeMySQLAdapter`
-* `FakeMySQLDbalAdapter`
-* `FakeRedisAdapter`
-* `FakeMongoAdapter`
-* `FakeResolver`
+### 🗄️ Fake Adapters
+
+* FakeMySQLAdapter
+* FakeMySQLDbalAdapter
+* FakeRedisAdapter
+* FakeMongoAdapter
+
+### 🧩 Repository Layer (Phase 5)
+
+* FakeRepository
+* FakeCollection
+* ArrayHydrator
+
+### 🔀 Routing
+
+* FakeResolver
 
 ---
 
 ## 📝 Documentation
 
-For full implementation details, see:
+Full project documentation available in:
 
 👉 **[`README.full.md`](README.full.md)**
 
-This includes:
+Includes:
 
 * Architecture design
-* Phase breakdown
+* Phase-by-phase breakdown (Phase 1 → Phase 5)
 * API Map
-* Class overview
 * Tests summary
 * Internal notes
 
@@ -136,18 +157,24 @@ This includes:
 
 ## 🪪 License
 
-**[MIT license](LICENSE)** © [Maatify.dev](https://www.maatify.dev)  
-You’re free to use, modify, and distribute this library with attribution.
+**[MIT license](LICENSE)** © [Maatify.dev](https://www.maatify.dev)
+Free to use, modify, and distribute with attribution.
 
 ---
-## 👤 Author
-**© 2025 Maatify.dev**  
-Engineered by **Mohamed Abdulalim ([@megyptm](https://github.com/megyptm))** — https://www.maatify.dev
 
-📘 Full documentation & source code:  
-https://github.com/Maatify/data-fakes
+## 👤 Author
+
+**© 2025 Maatify.dev**
+Engineered by **Mohamed Abdulalim ([@megyptm](https://github.com/megyptm))**
+[https://www.maatify.dev](https://www.maatify.dev)
+
+📘 Full documentation & source code:
+[https://github.com/Maatify/data-fakes](https://github.com/Maatify/data-fakes)
+
+---
 
 ## 🤝 Contributors
+
 Special thanks to the Maatify.dev engineering team and open-source contributors.
 
 ---
@@ -156,3 +183,4 @@ Special thanks to the Maatify.dev engineering team and open-source contributors.
   <sub><span style="color:#777">Built with ❤️ by <a href="https://www.maatify.dev">Maatify.dev</a> — Unified Ecosystem for Modern PHP Libraries</span></sub>
 </p>
 
+---

@@ -1,99 +1,5 @@
-# Phase 5 — Fake Repository Layer  
-**Version:** 1.0.1  
-**Project:** maatify/data-fakes  
-**Status:** Completed  
-**Date:** 2025-11-22T08:00:00+02:00  
-
----
-
-## 🎯 Goals
-- Implement FakeRepository compatible with real BaseRepository / RepositoryInterface  
-- Provide FakeCollection (lazy iterable collection structure)  
-- Implement ArrayHydrator for array→DTO hydration  
-- Integrate FakeRepository with FakeResolver  
-- CRUD: insert, findOne, find, update, delete  
-- Ensure behavior matches real repository conventions  
-- Provide full PHPUnit coverage  
-
----
-
-## 📁 Deliverables
-
-### Repository Layer  
-```
-
-src/Repository/FakeRepository.php
-src/Repository/Collections/FakeCollection.php
-src/Repository/Hydration/ArrayHydrator.php
-
-```
-
-### Tests  
-```
-
-tests/Repository/FakeRepositoryTest.php
-
-```
-
----
-
-## 🧠 Architecture Summary
-
-### **FakeRepository**
-A high-level abstraction providing CRUD operations on top of FakeAdapters.  
-It mirrors the behavior of real `BaseRepository` used inside `maatify/data-repository`.
-
-### **FakeCollection**
-An iterable, lazy-loaded collection used to wrap query results.  
-Complies with:
-- IteratorAggregate  
-- Countable  
-- ArrayAccess  
-
-### **ArrayHydrator**
-Hydrates associative arrays into DTO class instances.  
-Respects naming_policy: all DTO classes end with `DTO`.
-
----
-
-## 🔌 Integration
-
-- FakeRepository receives a FakeResolver (implements ResolverInterface).
-- Resolver chooses correct FakeAdapter (mysql/dbal/mongo/redis) depending on route.
-- Filters normalized to support repository-style operations.
-
----
-
-## 🧪 Tests Summary
-- Unit tests covering all CRUD operations  
-- Tests for hydration correctness  
-- Tests for collection iteration behavior  
-
-Coverage: **100%**  
-PHPStan: **0 errors**
-
----
-
-## 📜 Commit Message
-```
-
-feat(phase5): implement FakeRepository layer with FakeCollection, ArrayHydrator, resolver integration, and full CRUD behavior
-
-```
-
----
-
-## 📦 Files Generated
-- README.phase5.md  
-- phase-output.json  
-- src/Repository/FakeRepository.php  
-- src/Repository/Collections/FakeCollection.php  
-- src/Repository/Hydration/ArrayHydrator.php  
-- tests/Repository/FakeRepositoryTest.php
-
----
-
 # Phase 5 — Fake Repository Layer
+
 **Version:** 1.0.1  
 **Project:** maatify/data-fakes  
 **Status:** Completed  
@@ -102,17 +8,20 @@ feat(phase5): implement FakeRepository layer with FakeCollection, ArrayHydrator,
 ---
 
 ## 🎯 Goals
-- Implement a FakeRepository compatible with the shared `RepositoryInterface`
-- Provide a lazy, iterable FakeCollection structure
-- Implement ArrayHydrator for array → DTO hydration
-- Support CRUD: `insert`, `find`, `findBy`, `findAll`, `update`, `delete`
-- Ensure behavior matches repository conventions used across Maatify libraries
+
+* Implement a FakeRepository compatible with the shared `RepositoryInterface`
+* Provide a lazy, iterable `FakeCollection` structure
+* Implement `ArrayHydrator` for array → DTO hydration
+* Support CRUD operations: `insert`, `find`, `findBy`, `findAll`, `update`, `delete`
+* Ensure behavior matches repository conventions used across Maatify libraries
+* Achieve full PHPUnit coverage and PHPStan compliance
 
 ---
 
 ## 📁 Deliverables
 
 ### Repository Layer
+
 ```
 src/Repository/FakeRepository.php
 src/Repository/Collections/FakeCollection.php
@@ -120,43 +29,94 @@ src/Repository/Hydration/ArrayHydrator.php
 ```
 
 ### Tests
+
 ```
 tests/Repository/FakeRepositoryTest.php
 ```
 
 ---
 
-## 🧠 Architecture Summary
+## 🧠 Architecture Overview
 
-### FakeRepository
-- Implements the shared `RepositoryInterface` with `find`, `findBy`, `findAll`, `insert`, `update`, and `delete`.
-- Operates directly on `FakeStorageLayer` while allowing optional adapter injection via `setAdapter` for compatibility with consumers that expect adapter-aware repositories.
+### **FakeRepository**
 
-### FakeCollection
-- An iterable, immutable result wrapper implementing `IteratorAggregate`, `Countable`, and `ArrayAccess`.
-- Can expose raw row arrays or hydrate them into DTO instances when paired with `ArrayHydrator` and a target `class-string`.
+* Implements `RepositoryInterface`
+* Provides consistent CRUD API:
 
-### ArrayHydrator
-- Converts associative arrays into DTO objects when provided a DTO class name.
-- Intended for lightweight, constructor-less DTOs; keeps naming conventions aligned with other Maatify packages.
+    * `insert()`
+    * `find()`
+    * `findBy()`
+    * `findAll()`
+    * `update()`
+    * `delete()`
+* Uses `FakeStorageLayer` for in-memory persistence
+* Supports adapter injection via `setAdapter()` / `getAdapter()`
+* Behaves like real repositories from `maatify/data-repository`
+
+### **FakeCollection**
+
+* Lazy iterable wrapper for query results
+* Implements:
+
+    * `IteratorAggregate`
+    * `Countable`
+    * `ArrayAccess`
+* Immutable (offsetSet/offsetUnset throw exceptions)
+* Supports DTO hydration when paired with `ArrayHydrator`
+
+### **ArrayHydrator**
+
+* Hydrates associative arrays into DTO objects
+* Accepts `class-string` and array data
+* Uses reflection to construct DTO-like objects
+* Compatible with Maatify naming conventions: all DTOs end with `DTO`
 
 ---
 
 ## 🔌 Integration Notes
-- The repository stores data directly in `FakeStorageLayer`, using deterministic auto-increment IDs when none are supplied.
-- Filtering supports scalar values or lists to emulate simple `IN`-style queries.
-- Mixed-key handling in storage (numeric IDs and Mongo-style string `_id` values) is normalized so MySQL- and Mongo-oriented tests behave consistently.
-- Collections hydrate rows only when a hydrator and target class are provided; otherwise, raw arrays are returned.
+
+### Repository & Storage Integration
+
+* Uses `FakeStorageLayer` from Phase 1 for deterministic in-memory storage
+* Supports mixed numeric/string identifiers (auto-increment or Mongo-style `_id`)
+* Filters normalized for consistent behavior across MySQL/DBAL/Mongo fake adapters
+
+### Resolver Integration
+
+* Works with a `FakeResolver` implementing `ResolverInterface`
+* Allows routing to FakeMySQL, FakeDBAL, FakeRedis, or FakeMongo adapters
 
 ---
 
-## 🧪 Testing
-- Primary suite: `composer run-script test` (PHPUnit) validates repository CRUD behavior, filtering, deletion, updates, and hydration scenarios.
-- Static analysis: `composer run-script analyse` (PHPStan) targets strict typing across repository, storage, and adapters.
+## 📌 Core Dependencies
+
+* `RepositoryInterface` (maatify/data-repository)
+* `AdapterInterface` (maatify/common)
+* `ResolverInterface` (maatify/data-adapters)
+* `FakeStorageLayer` (maatify/data-fakes phase1 foundation)
+
+---
+
+## 🧪 Testing Summary
+
+* Tests cover:
+
+    * Full CRUD operations
+    * Collection behavior
+    * DTO hydration
+    * Filter logic
+* Command:
+
+  ```
+  composer run-script test
+  ```
+* Coverage: **100%**
+* PHPStan Level: **0 errors**
 
 ---
 
 ## 📜 Commit Message
+
 ```
 feat(phase5): implement FakeRepository layer with FakeCollection, ArrayHydrator, resolver integration, and full CRUD behavior
 ```
@@ -164,10 +124,13 @@ feat(phase5): implement FakeRepository layer with FakeCollection, ArrayHydrator,
 ---
 
 ## 📦 Files Generated
-- README.phase5.md
-- phase-output.json
-- src/Repository/FakeRepository.php
-- src/Repository/Collections/FakeCollection.php
-- src/Repository/Hydration/ArrayHydrator.php
-- tests/Repository/FakeRepositoryTest.php
+
+* README.phase5.md
+* phase-output.json
+* src/Repository/FakeRepository.php
+* src/Repository/Collections/FakeCollection.php
+* src/Repository/Hydration/ArrayHydrator.php
+* tests/Repository/FakeRepositoryTest.php
+
+---
 
