@@ -5,6 +5,56 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
+## [1.0.2] — 2025-11-22
+
+### 🚀 Added — Phase 6: Unit of Work + Snapshot Engine
+
+This release introduces a full transactional layer on top of the in-memory storage system,
+enabling nested transactions, rollback support, and deterministic state recovery.
+
+#### 🧱 Unit of Work
+
+* Added `FakeUnitOfWork`
+    * `begin()` / `commit()` / `rollback()`
+    * Nested snapshot stacks
+    * `transactional()` callback wrapper for atomic execution
+    * Adapter-agnostic design
+
+#### 📸 Snapshot Engine
+
+* Added `SnapshotManager`
+* Added `SnapshotState`
+* Full export/import of:
+    * Storage tables
+    * Auto-increment counters
+* Enables deterministic rollback flows
+
+#### 🗄 Storage Layer Enhancements
+
+* Extended `FakeStorageLayer` with:
+    * `exportState()`
+    * `importState()`
+* Improved state consistency across adapters
+* Added deep copy protection for immutable snapshots
+
+#### 🧪 Tests
+
+* Added `FakeUnitOfWorkTest`
+* Added `SnapshotManagerTest`
+* Verified:
+    * Commit propagation
+    * Rollback correctness
+    * Nested transactions
+    * Exception-safe transactional execution
+
+#### 📝 Documentation
+
+* Updated `README.full.md`
+* Added `README.phase6.md`
+
+---
+
+
 ## [1.0.0] — 2025-11-22
 
 ### 🎉 First Stable Release

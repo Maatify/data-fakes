@@ -1,7 +1,7 @@
 # 📘 Maatify Data Fakes
 
 **In-Memory Fake Adapters for MySQL, Redis, MongoDB & Repository Layer**  
-**Version:** 1.0.1  
+**Version:** 1.0.2  
 **Project:** `maatify/data-fakes`  
 **Maintained by:** Maatify.dev
 
@@ -17,9 +17,10 @@ It allows any repository or service to run and be tested **without real database
 - Fake MySQL DBAL Adapter
 - Fake Redis Adapter
 - Fake MongoDB Adapter
-- Fake Repository Layer (Phase 5)
+- Fake Repository Layer
+- **Fake Unit of Work & Snapshot Engine (Phase 6)**
 - Fully deterministic test isolation
-- Zero external services required — perfect for CI
+- No external services required — perfect for CI
 
 All Fake Adapters follow the **exact same contracts** used by real adapters across the Maatify ecosystem.
 
@@ -41,19 +42,29 @@ This ensures **1:1 compatibility** between fake drivers and their real counterpa
 
 ## 🧩 Features
 
+### 🔌 Fake Adapter Capabilities
 - Full in-memory storage engine
 - Auto-increment ID emulation
 - SQL-like filtering, ordering, limit/offset
 - Mongo-like operators (`$in`, `$gt`, `$lte`, `$ne`)
 - Redis-like primitives (strings, lists, hashes, counters, TTL)
-- Repository layer:
-    - `FakeRepository`
-    - `FakeCollection`
-    - `ArrayHydrator`
-- Clean Adapter lifecycle:
-    - `connect()`, `disconnect()`
-    - `healthCheck()`, `isConnected()`
-    - `getDriver()`
+
+### 🧱 Repository Layer
+- `FakeRepository`
+- `FakeCollection`
+- `ArrayHydrator`
+
+### 🔄 Unit of Work & Snapshots (Phase 6)
+- Full transactional grouping
+- Nested transactions
+- Instant rollback
+- Deterministic and isolated state
+- Storage-level snapshots for all adapters
+
+### ⚙ Adapter Lifecycle
+- `connect()`, `disconnect()`
+- `healthCheck()`, `isConnected()`
+- `getDriver()`
 
 ---
 
@@ -61,9 +72,9 @@ This ensures **1:1 compatibility** between fake drivers and their real counterpa
 
 ```bash
 composer require maatify/data-fakes --dev
-````
+```
 
-✔ For testing environments
+✔ Recommended for testing & CI  
 ✘ Not intended for production usage
 
 ---
@@ -91,38 +102,70 @@ FakeStorageLayer::reset();
 
 ## 📁 Included Components
 
-### Fake Adapters
+### 🔹 Fake Adapters
+- FakeMySQLAdapter
+- FakeMySQLDbalAdapter
+- FakeRedisAdapter
+- FakeMongoAdapter
 
-* FakeMySQLAdapter
-* FakeMySQLDbalAdapter
-* FakeRedisAdapter
-* FakeMongoAdapter
+### 🔹 Repository Layer
+- FakeRepository
+- FakeCollection
+- ArrayHydrator
 
-### Repository Layer
+### 🔹 Routing
+- FakeResolver
 
-* FakeRepository
-* FakeCollection
-* ArrayHydrator
+### 🔹 **Unit of Work (Phase 6)**
+- `FakeUnitOfWork`
+- `SnapshotManager`
+- `SnapshotState`
 
-### Routing
+---
 
-* FakeResolver
+## 🧩 Architectural Highlights
+
+### FakeStorageLayer
+- Central deterministic memory engine
+- Shared across all fake adapters
+- Supports snapshot export/import
+- Auto ID management
+
+### Snapshot System (Phase 6)
+- Immutable snapshot objects
+- Storage-wide state capture
+- Full restore support
+
+### Unit of Work (Phase 6)
+- Stacked snapshots
+- Nested begin/commit/rollback
+- Transactional helper wrapper
+- Adapter-agnostic
+
+---
+
+## 📚 Development Phases
+
+- **Phase 1:** Project Bootstrap & Core Architecture
+- **Phase 2:** Fake MySQL + DBAL Adapter
+- **Phase 3:** Fake Redis Adapter
+- **Phase 4:** Fake Mongo Adapter
+- **Phase 5:** Repository Layer
+- **Phase 6:** **Unit of Work + Snapshot Engine** 🆕
 
 ---
 
 ## 📘 Full Documentation
 
-Full implementation details are available in:
-👉 **[`README.full.md`](README.full.md)**
+Full implementation details:
 
-Contents include:
-
-* Architecture design
-* Development phases (Phase 1 → Phase 5)
-* API Map
-* Class overviews
-* Tests summary
-* Internal behavior notes
+- Architecture overview
+- Development phases (1 → 6)
+- API map
+- Class reference
+- Test behavior and isolation rules
+- Adapter lifecycles
+- Repository usage
 
 ---
 
@@ -134,11 +177,11 @@ Contents include:
 
 ## 👤 Author
 
-Engineered by **Mohamed Abdulalim ([@megyptm](https://github.com/megyptm))**
-[https://www.maatify.dev](https://www.maatify.dev)
+Engineered by **Mohamed Abdulalim ([@megyptm](https://github.com/megyptm))**  
+https://www.maatify.dev
 
-📘 Full source:
-[https://github.com/Maatify/data-fakes](https://github.com/Maatify/data-fakes)
+📘 Full source:  
+https://github.com/Maatify/data-fakes
 
 ---
 

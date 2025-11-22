@@ -21,11 +21,10 @@
 [![Security](https://img.shields.io/badge/Security-Policy-important)](SECURITY.md)
 
 ---
-
 # 📘 Maatify Data Fakes
 
 **In-Memory Fake Adapters for MySQL, Redis, MongoDB & Repository Layer**  
-**Version:** 1.0.1  
+**Version:** 1.0.2  
 **Project:** `maatify/data-fakes`  
 **Maintained by:** Maatify.dev
 
@@ -41,7 +40,8 @@ It allows any repository or service to run and be tested **without any real data
 * Fake MySQL DBAL Adapter
 * Fake Redis Adapter
 * Fake MongoDB Adapter
-* Fake Repository Layer (Phase 5)
+* Fake Repository Layer
+* **Unit of Work + Snapshot Engine (Phase 6)**
 * Fully deterministic test isolation
 * Zero external services required — perfect for CI
 
@@ -51,38 +51,46 @@ All Fake Adapters follow the **exact same contracts** used by real adapters acro
 
 ## 🔑 Core Dependencies
 
-The core of the entire library is built on two interfaces:
+The core of the library is built directly on two interfaces:
 
-1. **AdapterInterface**
+1. **AdapterInterface**  
    `Maatify\Common\Contracts\Adapter\AdapterInterface`
 
-2. **ResolverInterface**
+2. **ResolverInterface**  
    `Maatify\DataAdapters\Contracts\ResolverInterface`
 
-Every Fake Adapter implements `AdapterInterface`
-and is routed through `ResolverInterface` to ensure **1:1 behavior** with real adapters.
+Every Fake Adapter implements `AdapterInterface` and is routed through `ResolverInterface` to ensure **1:1 behavior** with real adapters.
 
 ---
 
 ## 🧩 Features
 
+### 🗄️ Storage Features
 * Fully in-memory storage layer
 * Auto-increment & mixed ID handling
+* Snapshot export/import (Phase 6)
+* Deterministic state across tests
+
+### 🔍 Query Features
 * SQL-like filtering (where/in/like/order/limit)
-* Redis-like operations (strings, lists, hashes, counters, TTL)
 * Mongo-like operators (`$in`, `$gt`, `$lte`, `$ne`, etc.)
-* Fake Repository layer:
+* Redis-like operations (strings, lists, hashes, counters, TTL)
 
-    * FakeRepository
-    * FakeCollection
-    * ArrayHydrator
-* Complete Adapter lifecycle:
+### 🧱 Repository Features
+* FakeRepository
+* FakeCollection
+* ArrayHydrator
 
-    * `connect()`, `disconnect()`
-    * `healthCheck()`
-    * `isConnected()`
-    * `getDriver()`
-* Test isolation using `FakeStorageLayer`
+### 🔄 Unit of Work (Phase 6)
+* Transaction begin/commit/rollback
+* Nested transactions via stacked snapshots
+* Atomic callback wrapper: `transactional()`
+
+### 🔌 Adapter Lifecycle
+* `connect()` / `disconnect()`
+* `healthCheck()`
+* `isConnected()`
+* `getDriver()`
 
 ---
 
@@ -92,14 +100,14 @@ and is routed through `ResolverInterface` to ensure **1:1 behavior** with real a
 composer require maatify/data-fakes --dev
 ```
 
-✔ Intended for **testing environments**
+✔ Intended for **testing environments**  
 ✘ Not intended for production usage
 
 ---
 
 ## 🧪 Basic Usage
 
-### Using the Fake Resolver
+### Using Fake Resolver
 
 ```php
 use Maatify\DataFakes\Resolvers\FakeResolver;
@@ -121,21 +129,23 @@ FakeStorageLayer::reset();
 ## 📁 Fake Components Included
 
 ### 🗄️ Fake Adapters
-
 * FakeMySQLAdapter
 * FakeMySQLDbalAdapter
 * FakeRedisAdapter
 * FakeMongoAdapter
 
 ### 🧩 Repository Layer (Phase 5)
-
 * FakeRepository
 * FakeCollection
 * ArrayHydrator
 
 ### 🔀 Routing
-
 * FakeResolver
+
+### 🔄 Unit of Work & Snapshots (Phase 6)
+* FakeUnitOfWork
+* SnapshotManager
+* SnapshotState
 
 ---
 
@@ -148,7 +158,7 @@ Full project documentation available in:
 Includes:
 
 * Architecture design
-* Phase-by-phase breakdown (Phase 1 → Phase 5)
+* Phase-by-phase breakdown (Phase 1 → Phase 6)
 * API Map
 * Tests summary
 * Internal notes
@@ -157,19 +167,19 @@ Includes:
 
 ## 🪪 License
 
-**[MIT license](LICENSE)** © [Maatify.dev](https://www.maatify.dev)
+**[MIT license](LICENSE)** © [Maatify.dev](https://www.maatify.dev)  
 Free to use, modify, and distribute with attribution.
 
 ---
 
 ## 👤 Author
 
-**© 2025 Maatify.dev**
-Engineered by **Mohamed Abdulalim ([@megyptm](https://github.com/megyptm))**
-[https://www.maatify.dev](https://www.maatify.dev)
+**© 2025 Maatify.dev**  
+Engineered by **Mohamed Abdulalim ([@megyptm](https://github.com/megyptm))**  
+https://www.maatify.dev
 
-📘 Full documentation & source code:
-[https://github.com/Maatify/data-fakes](https://github.com/Maatify/data-fakes)
+📘 Full documentation & source code:  
+https://github.com/Maatify/data-fakes
 
 ---
 
@@ -183,4 +193,4 @@ Special thanks to the Maatify.dev engineering team and open-source contributors.
   <sub><span style="color:#777">Built with ❤️ by <a href="https://www.maatify.dev">Maatify.dev</a> — Unified Ecosystem for Modern PHP Libraries</span></sub>
 </p>
 
----
+

@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Storage;
+namespace Maatify\DataFakes\Tests\Storage;
 
 use Maatify\DataFakes\Storage\FakeStorageLayer;
 use PHPUnit\Framework\Attributes\CoversClass;

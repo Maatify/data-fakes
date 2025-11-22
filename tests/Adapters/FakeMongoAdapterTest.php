@@ -13,6 +13,8 @@
 
 declare(strict_types=1);
 
+namespace Maatify\DataFakes\Tests\Adapters;
+
 use PHPUnit\Framework\TestCase;
 use Maatify\DataFakes\Adapters\Mongo\FakeMongoAdapter;
 use Maatify\DataFakes\Storage\FakeStorageLayer;

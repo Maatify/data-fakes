@@ -180,6 +180,31 @@ class FakeStorageLayer
     }
 
     /**
+     * Export both tables and auto-increment metadata for snapshotting.
+     *
+     * @return array{tables: array<string, array<int|string, array<string, mixed>>>, autoIds: array<string, int>}
+     */
+    public function exportState(): array
+    {
+        return [
+            'tables'  => $this->tables,
+            'autoIds' => $this->autoIds,
+        ];
+    }
+
+    /**
+     * Import a previously exported storage state.
+     *
+     * @param array<string, array<int|string, array<string, mixed>>> $tables
+     * @param array<string, int>                                      $autoIds
+     */
+    public function importState(array $tables, array $autoIds): void
+    {
+        $this->tables  = $tables;
+        $this->autoIds = $autoIds;
+    }
+
+    /**
      * Delete a whole table.
      */
     public function drop(string $table): void
