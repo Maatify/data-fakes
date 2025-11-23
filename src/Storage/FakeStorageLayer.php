@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Maatify\DataFakes\Storage;
 
+use Maatify\DataFakes\Simulation\LatencySimulator;
+
 /**
  * FakeStorageLayer
  *
@@ -32,6 +34,20 @@ class FakeStorageLayer
     /** @var array<string, int> */
     private array $autoIds = [];
 
+    private ?LatencySimulator $latencySimulator = null;
+
+    public function setLatencySimulator(LatencySimulator $latencySimulator): void
+    {
+        $this->latencySimulator = $latencySimulator;
+    }
+
+    private function applyLatency(string $operation): void
+    {
+        if ($this->latencySimulator !== null) {
+            $this->latencySimulator->applyLatency($operation);
+        }
+    }
+
     /**
      * Read all rows of a table.
      *
@@ -40,6 +56,7 @@ class FakeStorageLayer
      */
     public function read(string $table): array
     {
+        $this->applyLatency('storage.read');
         return $this->tables[$table] ?? [];
     }
 
@@ -52,6 +69,7 @@ class FakeStorageLayer
      */
     public function readById(string $table, int|string $id): ?array
     {
+        $this->applyLatency('storage.read_by_id');
         $normalizedId = $this->normalizeKey($id);
 
         return $this->tables[$table][$normalizedId] ?? null;
@@ -67,6 +85,7 @@ class FakeStorageLayer
      */
     public function write(string $table, array $row): array
     {
+        $this->applyLatency('storage.write');
         // Initialize table if not exists
         if (!isset($this->tables[$table])) {
             $this->tables[$table] = [];
@@ -99,6 +118,7 @@ class FakeStorageLayer
      */
     public function updateById(string $table, int|string $id, array $updates): ?array
     {
+        $this->applyLatency('storage.update');
         $row = $this->readById($table, $id);
         if ($row === null) {
             return null;
@@ -119,6 +139,7 @@ class FakeStorageLayer
      */
     public function writeTable(string $table, array $rows): void
     {
+        $this->applyLatency('storage.write_table');
         $normalizedRows = [];
         foreach ($rows as $row) {
             // Prefer an explicit numeric id, otherwise fall back to Mongo-style _id
@@ -158,6 +179,7 @@ class FakeStorageLayer
      */
     public function deleteById(string $table, int|string $id): bool
     {
+        $this->applyLatency('storage.delete');
         $normalizedId = $this->normalizeKey($id);
         if (!isset($this->tables[$table][$normalizedId])) {
             return false;
@@ -176,6 +198,7 @@ class FakeStorageLayer
      */
     public function listAll(string $table): array
     {
+        $this->applyLatency('storage.list');
         return array_values($this->read($table));
     }
 
@@ -186,6 +209,7 @@ class FakeStorageLayer
      */
     public function exportState(): array
     {
+        $this->applyLatency('storage.export_state');
         return [
             'tables'  => $this->tables,
             'autoIds' => $this->autoIds,
@@ -200,6 +224,7 @@ class FakeStorageLayer
      */
     public function importState(array $tables, array $autoIds): void
     {
+        $this->applyLatency('storage.import_state');
         $this->tables  = $tables;
         $this->autoIds = $autoIds;
     }
@@ -209,6 +234,7 @@ class FakeStorageLayer
      */
     public function drop(string $table): void
     {
+        $this->applyLatency('storage.drop');
         unset($this->tables[$table], $this->autoIds[$table]);
     }
 
@@ -217,6 +243,7 @@ class FakeStorageLayer
      */
     public function reset(): void
     {
+        $this->applyLatency('storage.reset');
         $this->tables  = [];
         $this->autoIds = [];
     }
@@ -228,6 +255,7 @@ class FakeStorageLayer
      */
     public function export(): array
     {
+        $this->applyLatency('storage.export');
         return $this->tables;
     }
 

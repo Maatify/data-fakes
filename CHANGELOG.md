@@ -4,6 +4,64 @@ All notable changes to **maatify/data-fakes** will be documented in this file.
 The format is based on **Keep a Changelog**, and this project adheres to **Semantic Versioning**.
 
 ---
+
+## [1.0.4] — 2025-11-22
+
+### 🚀 Added — Phase 8: Advanced Simulation Layer (Latency + Failure Injection)
+
+This release introduces a complete simulation layer for simulating latency, jitter,
+and controlled deterministic failures across all fake adapters.  
+It is designed for **CI pipelines, stress testing, and advanced repository validation**.
+
+#### ⚡ Simulation Core
+
+* Added `ErrorSimulator`
+    * Registers operation-level failure scenarios
+    * Supports probability-based deterministic failures
+    * Throws configured exceptions when triggered
+    * Useful for retry testing and resilience logic
+
+* Added `LatencySimulator`
+    * Simulates per-operation latency
+    * Supports default latency and operation-specific overrides
+    * Adds optional jitter for pseudo-realistic slowdowns
+    * Returns final applied latency (in ms) for verification
+
+* Added `FailureScenario`
+    * Immutable failure definition
+    * Includes: name, probability, exception class, message, code
+
+#### 🧩 Adapter Integration
+
+* Added `SimulationAwareTrait`
+    * Provides `guardOperation()` hook
+    * Integrates error and latency simulators into adapters
+    * Used by FakeMySQLAdapter, FakeMongoAdapter, FakeRedisAdapter
+
+* Updated Fake Adapters:
+    * FakeMySQLAdapter now supports per-operation failure simulation
+    * FakeMongoAdapter integrated with latency hooks
+    * FakeRedisAdapter updated to support deterministic delay
+
+* Updated `FakeStorageLayer`
+    * Accepts latency simulation for slow-storage emulation
+
+#### 🧪 Tests
+
+* Added `ErrorSimulatorTest`
+    * Ensures deterministic failure triggering
+    * Validates non-triggering scenarios
+    * Tests probability handling
+
+* Added latency simulation tests inside adapter suites
+
+#### 📝 Documentation
+
+* Added `README.phase8.md`
+* Updated main README with new Simulation Layer features
+* Updated full documentation in [`README.full.md`](docs/README.full.md)
+
+---
 ## [1.0.3] — 2025-11-22
 
 ### 🚀 Added — Phase 7: Fixtures Loader & FakeEnvironment
@@ -48,7 +106,7 @@ environment resets.
 #### 📝 Documentation
 
 * Added `README.phase7.md`
-* Updated `README.full.md` with Phase 7 details
+* Updated [`README.full.md`](docs/README.full.md) with Phase 7 details
 * Updated component list and basic usage examples
 
 ---
@@ -97,7 +155,7 @@ enabling nested transactions, rollback support, and deterministic state recovery
 
 #### 📝 Documentation
 
-* Updated `README.full.md`
+* Updated [`README.full.md`](docs/README.full.md)
 * Added `README.phase6.md`
 
 ---

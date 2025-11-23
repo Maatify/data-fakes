@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Maatify\DataFakes\Adapters\MySQL;
 
 use Maatify\Common\Contracts\Adapter\AdapterInterface;
+use Maatify\DataFakes\Adapters\Base\Traits\SimulationAwareTrait;
 use Maatify\DataFakes\Storage\FakeStorageLayer;
 use Maatify\DataFakes\Adapters\Base\Traits\NormalizesInputTrait;
 use Maatify\DataFakes\Adapters\Base\Traits\QueryFilterTrait;
@@ -30,6 +31,7 @@ class FakeMySQLAdapter implements AdapterInterface
 {
     use NormalizesInputTrait;
     use QueryFilterTrait;
+    use SimulationAwareTrait;
 
     private bool $connected = false;
 
@@ -44,11 +46,13 @@ class FakeMySQLAdapter implements AdapterInterface
 
     public function connect(): void
     {
+        $this->guardOperation('mysql.connect');
         $this->connected = true;
     }
 
     public function isConnected(): bool
     {
+        $this->guardOperation('mysql.health');
         return $this->connected;
     }
 
@@ -59,16 +63,19 @@ class FakeMySQLAdapter implements AdapterInterface
      */
     public function getConnection(): mixed
     {
+        $this->guardOperation('mysql.connection');
         return $this->connected ? $this->storage : null;
     }
 
     public function healthCheck(): bool
     {
+        $this->guardOperation('mysql.health');
         return $this->connected;
     }
 
     public function disconnect(): void
     {
+        $this->guardOperation('mysql.disconnect');
         $this->connected = false;
     }
 
@@ -79,6 +86,7 @@ class FakeMySQLAdapter implements AdapterInterface
      */
     public function getDriver(): mixed
     {
+        $this->guardOperation('mysql.driver');
         return $this->storage;
     }
 
@@ -100,6 +108,7 @@ class FakeMySQLAdapter implements AdapterInterface
      */
     public function select(string $table, array $filters = [], array $options = []): array
     {
+        $this->guardOperation('mysql.select');
         $rows = $this->storage->read($table);
 
         $rows = $this->applyFilters($rows, $filters);
@@ -128,6 +137,7 @@ class FakeMySQLAdapter implements AdapterInterface
      */
     public function insert(string $table, array $row): array
     {
+        $this->guardOperation('mysql.insert');
         $normalized = $this->normalizeRow($row);
 
         return $this->storage->write($table, $normalized);
@@ -142,6 +152,7 @@ class FakeMySQLAdapter implements AdapterInterface
      */
     public function update(string $table, array $filters, array $updates): int
     {
+        $this->guardOperation('mysql.update');
         $rows = $this->storage->read($table);
         $matched = $this->applyFilters($rows, $filters);
         $count = 0;
@@ -164,6 +175,7 @@ class FakeMySQLAdapter implements AdapterInterface
      */
     public function delete(string $table, array $filters): int
     {
+        $this->guardOperation('mysql.delete');
         $rows = $this->storage->read($table);
         $matched = $this->applyFilters($rows, $filters);
         $count = 0;

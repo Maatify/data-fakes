@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Maatify\DataFakes\Adapters\Mongo;
 
 use Maatify\Common\Contracts\Adapter\AdapterInterface;
+use Maatify\DataFakes\Adapters\Base\Traits\SimulationAwareTrait;
 use Maatify\DataFakes\Storage\FakeStorageLayer;
 
 /**
@@ -23,6 +24,8 @@ use Maatify\DataFakes\Storage\FakeStorageLayer;
  */
 class FakeMongoAdapter implements AdapterInterface
 {
+    use SimulationAwareTrait;
+
     private bool $connected = false;
 
     /**
@@ -37,31 +40,37 @@ class FakeMongoAdapter implements AdapterInterface
 
     public function connect(): void
     {
+        $this->guardOperation('mongo.connect');
         $this->connected = true;
     }
 
     public function disconnect(): void
     {
+        $this->guardOperation('mongo.disconnect');
         $this->connected = false;
     }
 
     public function isConnected(): bool
     {
+        $this->guardOperation('mongo.health');
         return $this->connected;
     }
 
     public function healthCheck(): bool
     {
+        $this->guardOperation('mongo.health');
         return $this->connected;
     }
 
     public function getDriver(): FakeStorageLayer
     {
+        $this->guardOperation('mongo.driver');
         return $this->storage;
     }
 
     public function getConnection(): FakeStorageLayer
     {
+        $this->guardOperation('mongo.connection');
         return $this->storage;
     }
 
@@ -71,6 +80,7 @@ class FakeMongoAdapter implements AdapterInterface
      */
     public function insertOne(string $collection, array $document): array
     {
+        $this->guardOperation('mongo.insert_one');
         if (! isset($document['_id'])) {
             $document['_id'] = $this->generateId();
         }
@@ -90,6 +100,7 @@ class FakeMongoAdapter implements AdapterInterface
      */
     public function insertMany(string $collection, array $documents): array
     {
+        $this->guardOperation('mongo.insert_many');
         $inserted = [];
 
         foreach ($documents as $doc) {
@@ -105,6 +116,7 @@ class FakeMongoAdapter implements AdapterInterface
      */
     public function findOne(string $collection, array $filters): ?array
     {
+        $this->guardOperation('mongo.find_one');
         $rows = $this->find($collection, $filters);
 
         return $rows[0] ?? null;
@@ -116,6 +128,7 @@ class FakeMongoAdapter implements AdapterInterface
      */
     public function find(string $collection, array $filters): array
     {
+        $this->guardOperation('mongo.find');
         /** @var array<int,array<string,mixed>> $rows */
         $rows = array_values($this->storage->read($collection));
 
@@ -136,6 +149,7 @@ class FakeMongoAdapter implements AdapterInterface
      */
     public function updateOne(string $collection, array $filters, array $updates): int
     {
+        $this->guardOperation('mongo.update');
         /** @var array<int,array<string,mixed>> $rows */
         $rows = array_values($this->storage->read($collection));
         $updated = 0;
@@ -161,6 +175,7 @@ class FakeMongoAdapter implements AdapterInterface
      */
     public function deleteOne(string $collection, array $filters): int
     {
+        $this->guardOperation('mongo.delete');
         /** @var array<int,array<string,mixed>> $rows */
         $rows = array_values($this->storage->read($collection));
         $deleted = 0;
