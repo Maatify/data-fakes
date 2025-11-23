@@ -70,15 +70,15 @@ tests/Storage/FakeStorageLayerTest.php
 ---
 
 ## 🧪 Tests Summary
-| Test Area                     | Status        |
-|-------------------------------|---------------|
-| CRUD operations               | ✅ Passed     |
-| Filters (IN / Contains / Regex) | ✅ Passed   |
-| Ordering ASC/DESC             | ✅ Passed     |
-| LIMIT / OFFSET                | ✅ Passed     |
-| DBAL wrapper                  | ✅ Passed     |
-| AdapterInterface lifecycle    | ✅ Passed     |
-| FakeStorageLayer consistency  | ✅ Passed     |
+| Test Area                       | Status   |
+|---------------------------------|----------|
+| CRUD operations                 | ✅ Passed |
+| Filters (IN / Contains / Regex) | ✅ Passed |
+| Ordering ASC/DESC               | ✅ Passed |
+| LIMIT / OFFSET                  | ✅ Passed |
+| DBAL wrapper                    | ✅ Passed |
+| AdapterInterface lifecycle      | ✅ Passed |
+| FakeStorageLayer consistency    | ✅ Passed |
 
 Coverage: **92%**  
 phpstan: **Level 6 — Clean**
