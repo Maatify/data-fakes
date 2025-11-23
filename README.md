@@ -24,7 +24,7 @@
 # 📘 Maatify Data Fakes
 
 **In-Memory Fake Adapters for MySQL, Redis, MongoDB & Repository Layer**  
-**Version:** 1.0.2  
+**Version:** 1.0.3  
 **Project:** `maatify/data-fakes`  
 **Maintained by:** Maatify.dev
 
