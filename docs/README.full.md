@@ -196,6 +196,12 @@ $env->loadFixturesFromFile(__DIR__.'/fixtures.json');
 
 ---
 
+## 📘 Usage Examples
+All examples are available in:
+→ [docs/examples.md](examples.md)
+
+---
+
 ## 📁 Included Components
 
 ### 🔹 Adapters

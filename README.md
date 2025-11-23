@@ -155,6 +155,11 @@ $rows = $db->select('users', ['id' => 1]);
 ```php
 FakeStorageLayer::reset();
 ```
+---
+
+## 📘 Usage Examples
+All examples are available in:
+→ [docs/examples.md](docs/examples.md)
 
 ---
 
