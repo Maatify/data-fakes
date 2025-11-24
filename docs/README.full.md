@@ -170,12 +170,19 @@ composer require maatify/data-fakes --dev
 
 ## 🧪 Basic Usage
 
-### Resolve a fake adapter
+### Use the Fake MySQL adapter
 
 ```php
-$resolver = new FakeResolver();
-$db = $resolver->resolve('mysql:main', true);
-$rows = $db->select('users', ['id' => 1]);
+use Maatify\DataFakes\Adapters\MySQL\FakeMySQLAdapter;
+use Maatify\DataFakes\Storage\FakeStorageLayer;
+
+$storage = new FakeStorageLayer();
+$mysql   = new FakeMySQLAdapter($storage);
+
+$mysql->connect();
+$mysql->insert('users', ['name' => 'Ada Lovelace']);
+
+$rows = $mysql->select('users', ['name' => 'Ada Lovelace']);
 ```
 
 ---
